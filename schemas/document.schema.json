@@ -42,7 +42,8 @@
         },
         "created": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
         },
         "description": {
           "type": "string",
@@ -67,7 +68,10 @@
             "properties": {
               "id": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "not": {
+                  "pattern": "[\\r\\n]"
+                }
               },
               "type": {
                 "const": "heading"
@@ -95,7 +99,10 @@
             "properties": {
               "id": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "not": {
+                  "pattern": "[\\r\\n]"
+                }
               },
               "type": {
                 "const": "paragraph"
@@ -118,7 +125,10 @@
             "properties": {
               "id": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "not": {
+                  "pattern": "[\\r\\n]"
+                }
               },
               "type": {
                 "const": "list"
@@ -147,7 +157,10 @@
             "properties": {
               "id": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                "not": {
+                  "pattern": "[\\r\\n]"
+                }
               },
               "type": {
                 "const": "figure"
