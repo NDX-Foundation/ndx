@@ -1,0 +1,8 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Fixture", "language": "en" },
+  "content": [
+    { "id": "p1", "type": "paragraph", "text": "Shared conformance fixture." }
+  ]
+}
