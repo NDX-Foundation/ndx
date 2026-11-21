@@ -11,6 +11,13 @@ from validate import validate_document
 
 
 class ValidateDocumentTests(unittest.TestCase):
+    def test_shared_conformance_fixtures(self):
+        fixtures = ROOT / "tests" / "fixtures"
+        self.assertEqual(validate_document(fixtures / "valid-minimal.ndx.json"), [])
+        self.assertTrue(validate_document(fixtures / "invalid-duplicate-ids.ndx.json"))
+        self.assertTrue(validate_document(fixtures / "invalid-created-date.ndx.json"))
+        self.assertTrue(validate_document(fixtures / "invalid-null-optional.ndx.json"))
+
     def test_example_document_is_valid(self):
         self.assertEqual(validate_document(ROOT / "examples" / "hello.ndx.json"), [])
 
