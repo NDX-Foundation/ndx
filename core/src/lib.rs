@@ -222,6 +222,7 @@ mod tests {
             include_bytes!("../../tests/fixtures/invalid-heading-level.ndx.json").as_slice(),
             include_bytes!("../../tests/fixtures/invalid-figure-alt.ndx.json").as_slice(),
             include_bytes!("../../tests/fixtures/invalid-language.ndx.json").as_slice(),
+            include_bytes!("../../tests/fixtures/invalid-block-id-trailing-newline.ndx.json").as_slice(),
         ] {
             assert!(parse_document(input).is_err());
         }
