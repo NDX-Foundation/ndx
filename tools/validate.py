@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +50,23 @@ def validate_document(document_path: Path) -> list[str]:
         f"{'.'.join(map(str, error.absolute_path)) or '<root>'}: {error.message}"
         for error in errors
     ]
+
+    # Keep date-time acceptance consistent across implementations even when
+    # a JSON Schema format checker is configured with reduced optional support.
+    if isinstance(document, dict):
+        metadata = document.get("metadata")
+        if isinstance(metadata, dict) and isinstance(metadata.get("created"), str):
+            created = metadata["created"]
+            rfc3339_shape = re.fullmatch(
+                r"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})",
+                created,
+            )
+            try:
+                if not rfc3339_shape:
+                    raise ValueError("not RFC 3339")
+                datetime.fromisoformat(created.replace("Z", "+00:00"))
+            except ValueError:
+                messages.append("metadata.created: must be an RFC 3339 date-time")
 
     if isinstance(document, dict):
         blocks = document.get("content", [])
