@@ -65,8 +65,18 @@ pub fn parse_document(input: &[u8]) -> Result<Document, NdxError> {
 fn validate(doc: &Document) -> Result<(), NdxError> {
     if doc.format != "ndx" { return Err(NdxError::new("NDX_E_FORMAT", "format must be 'ndx'")); }
     if doc.model_version != "0.1" { return Err(NdxError::new("NDX_E_VERSION", "modelVersion must be '0.1'")); }
-    if doc.metadata.title.trim().is_empty() || doc.metadata.title.chars().count() > 500 {
+    if doc.metadata.title.is_empty() || doc.metadata.title.chars().count() > 500 {
         return Err(NdxError::new("NDX_E_METADATA", "metadata.title must contain 1..500 characters"));
+    }
+    if doc.metadata.creator.as_ref().is_some_and(|s| s.chars().count() > 500)
+        || doc.metadata.description.as_ref().is_some_and(|s| s.chars().count() > 5_000)
+    {
+        return Err(NdxError::new("NDX_E_METADATA", "metadata creator or description exceeds its schema limit"));
+    }
+    if let Some(created) = &doc.metadata.created {
+        if time::OffsetDateTime::parse(created, &time::format_description::well_known::Rfc3339).is_err() {
+            return Err(NdxError::new("NDX_E_METADATA", "metadata.created must be an RFC 3339 date-time"));
+        }
     }
     if !(2..=35).contains(&doc.metadata.language.chars().count()) {
         return Err(NdxError::new("NDX_E_METADATA", "metadata.language must contain 2..35 characters"));
@@ -148,6 +158,15 @@ mod tests {
     }
     #[test] fn rejects_invalid_utf8() { assert_eq!(parse_document(&[0xff]).unwrap_err().code, "NDX_E_UTF8"); }
     #[test] fn rejects_oversized_input() { assert_eq!(parse_document(&vec![b' '; MAX_DOCUMENT_BYTES + 1]).unwrap_err().code, "NDX_E_SIZE_LIMIT"); }
+    #[test] fn rejects_invalid_created_timestamp() {
+        let input = br#"{"format":"ndx","modelVersion":"0.1","metadata":{"title":"x","language":"en","created":"yesterday"},"content":[{"id":"p","type":"paragraph","text":"x"}]}"#;
+        assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_METADATA");
+    }
+    #[test] fn rejects_oversized_metadata_description() {
+        let description = "x".repeat(5_001);
+        let json = format!(r#"{{"format":"ndx","modelVersion":"0.1","metadata":{{"title":"x","language":"en","description":"{}"}},"content":[{{"id":"p","type":"paragraph","text":"x"}}]}}"#, description);
+        assert_eq!(parse_document(json.as_bytes()).unwrap_err().code, "NDX_E_METADATA");
+    }
     #[test] fn rejects_empty_content() {
         let input = br#"{"format":"ndx","modelVersion":"0.1","metadata":{"title":"x","language":"en"},"content":[]}"#;
         assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_CONTENT");
