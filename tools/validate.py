@@ -58,7 +58,7 @@ def validate_document(document_path: Path) -> list[str]:
         if isinstance(metadata, dict) and isinstance(metadata.get("created"), str):
             created = metadata["created"]
             rfc3339_shape = re.fullmatch(
-                r"\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})",
+                r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})",
                 created,
             )
             try:
