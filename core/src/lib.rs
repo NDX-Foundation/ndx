@@ -56,10 +56,34 @@ pub fn parse_document(input: &[u8]) -> Result<Document, NdxError> {
     let value = NoDuplicateValue::deserialize(&mut deserializer)
         .map_err(|e| NdxError::new("NDX_E_JSON", e.to_string()))?;
     deserializer.end().map_err(|e| NdxError::new("NDX_E_JSON", e.to_string()))?;
+    reject_null_optionals(&value.0)?;
     let document: Document = serde_json::from_value(value.0)
         .map_err(|e| NdxError::new("NDX_E_MODEL", e.to_string()))?;
     validate(&document)?;
     Ok(document)
+}
+
+fn reject_null_optionals(value: &Value) -> Result<(), NdxError> {
+    let Some(root) = value.as_object() else { return Ok(()); };
+    if let Some(metadata) = root.get("metadata").and_then(Value::as_object) {
+        for key in ["creator", "created", "description"] {
+            if metadata.get(key).is_some_and(Value::is_null) {
+                return Err(NdxError::new("NDX_E_MODEL", format!("metadata.{key} must be omitted or a string, not null")));
+            }
+        }
+    }
+    if let Some(blocks) = root.get("content").and_then(Value::as_array) {
+        for (index, block) in blocks.iter().enumerate() {
+            if let Some(object) = block.as_object() {
+                for key in ["caption", "resource"] {
+                    if object.get(key).is_some_and(Value::is_null) {
+                        return Err(NdxError::new("NDX_E_MODEL", format!("content.{index}.{key} must be omitted or a string, not null")));
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 fn validate(doc: &Document) -> Result<(), NdxError> {
@@ -158,6 +182,22 @@ mod tests {
     }
     #[test] fn rejects_invalid_utf8() { assert_eq!(parse_document(&[0xff]).unwrap_err().code, "NDX_E_UTF8"); }
     #[test] fn rejects_oversized_input() { assert_eq!(parse_document(&vec![b' '; MAX_DOCUMENT_BYTES + 1]).unwrap_err().code, "NDX_E_SIZE_LIMIT"); }
+    #[test] fn shared_valid_fixture_parses() {
+        let input = include_bytes!("../../tests/fixtures/valid-minimal.ndx.json");
+        assert!(parse_document(input).is_ok());
+    }
+    #[test] fn shared_duplicate_id_fixture_rejected() {
+        let input = include_bytes!("../../tests/fixtures/invalid-duplicate-ids.ndx.json");
+        assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_DUPLICATE_ID");
+    }
+    #[test] fn shared_invalid_date_fixture_rejected() {
+        let input = include_bytes!("../../tests/fixtures/invalid-created-date.ndx.json");
+        assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_METADATA");
+    }
+    #[test] fn shared_null_optional_fixture_rejected() {
+        let input = include_bytes!("../../tests/fixtures/invalid-null-optional.ndx.json");
+        assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_MODEL");
+    }
     #[test] fn rejects_invalid_created_timestamp() {
         let input = br#"{"format":"ndx","modelVersion":"0.1","metadata":{"title":"x","language":"en","created":"yesterday"},"content":[{"id":"p","type":"paragraph","text":"x"}]}"#;
         assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_METADATA");
