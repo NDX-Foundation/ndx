@@ -94,9 +94,14 @@ def main() -> int:
 
     try:
         errors = validate_document(args.document)
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError, DuplicateKeyError, ValueError) as exc:
+    except OSError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
+    except (UnicodeDecodeError, json.JSONDecodeError, DuplicateKeyError, ValueError) as exc:
+        # Invalid document input uses exit 1, matching the Rust CLI. Exit 2 is
+        # reserved for usage and filesystem errors in both implementations.
+        print(f"INVALID: {exc}", file=sys.stderr)
+        return 1
 
     if errors:
         for error in errors:
