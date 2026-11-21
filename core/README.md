@@ -8,6 +8,18 @@ It currently:
 - Rejects unknown model fields and explicit null values for optional string fields.
 - Checks the model version, required metadata, RFC 3339 creation timestamps, block constraints, and unique stable block IDs.
 - Exposes structured parser error codes.
+- Provides the `ndx-validate` command-line validator.
+
+## Validate a document
+
+From the repository root:
+
+    cargo run --manifest-path core/Cargo.toml --bin ndx-validate -- examples/hello.ndx.json
+
+Exit codes:
+- `0`: document accepted by the experimental model
+- `1`: document rejected by the parser/model checks
+- `2`: usage or file I/O error
 
 ## Shared conformance fixtures
 
