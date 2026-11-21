@@ -2,7 +2,6 @@
 name = "ndx-core"
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
 description = "Experimental parser for the NDX semantic document model"
 
 [dependencies]
