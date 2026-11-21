@@ -30,7 +30,10 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 
 
 def _load_json(path: Path) -> Any:
-    raw = path.read_bytes()
+    # Read at most limit + 1 bytes so oversized files are rejected without
+    # first allocating memory proportional to an untrusted file's full size.
+    with path.open("rb") as source:
+        raw = source.read(MAX_DOCUMENT_BYTES + 1)
     if len(raw) > MAX_DOCUMENT_BYTES:
         raise ValueError(f"document exceeds {MAX_DOCUMENT_BYTES} byte limit")
     text = raw.decode("utf-8")
