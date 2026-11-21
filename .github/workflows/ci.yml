@@ -27,4 +27,4 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Run Rust core tests
-        run: cargo test --manifest-path core/Cargo.toml --locked
+        run: cargo test --manifest-path core/Cargo.toml
