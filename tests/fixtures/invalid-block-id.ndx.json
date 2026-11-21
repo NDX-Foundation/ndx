@@ -1,0 +1,6 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Invalid ID", "language": "en" },
+  "content": [{ "id": "-bad", "type": "paragraph", "text": "Invalid ID." }]
+}
