@@ -1,7 +1,7 @@
 use ndx_core::{parse_document, MAX_DOCUMENT_BYTES};
 use std::env;
 use std::fs::File;
-use std::io::{self, Read};
+use std::io::Read;
 use std::process::ExitCode;
 
 fn run() -> Result<(), (u8, String)> {
