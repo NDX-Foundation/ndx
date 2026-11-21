@@ -7,7 +7,7 @@ fn validator() -> Command {
 #[test]
 fn accepts_valid_shared_fixture() {
     let output = validator()
-        .arg("../../tests/fixtures/valid-minimal.ndx.json")
+        .arg("../tests/fixtures/valid-minimal.ndx.json")
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .output()
         .expect("run validator");
@@ -19,7 +19,7 @@ fn accepts_valid_shared_fixture() {
 #[test]
 fn rejects_invalid_shared_fixture_with_nonzero_exit() {
     let output = validator()
-        .arg("../../tests/fixtures/invalid-duplicate-ids.ndx.json")
+        .arg("../tests/fixtures/invalid-duplicate-ids.ndx.json")
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .output()
         .expect("run validator");
