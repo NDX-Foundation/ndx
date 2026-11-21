@@ -14,7 +14,7 @@ Exit codes: `0` accepted, `1` invalid document, `2` usage or file I/O error.
 
 ## Shared conformance fixtures
 
-Language-neutral fixtures live in `tests/fixtures/`. Rust core tests and Python validator tests consume the same valid and invalid documents. This is an initial parity check, not a complete generated conformance suite.
+Language-neutral fixtures live in `tests/fixtures/`. Rust core tests and Python validator tests consume the same valid documents (minimal and all supported block types) and invalid documents (duplicate IDs, invalid timestamps, explicit null optionals, invalid IDs, heading levels, figure alt text, and language length). This is an initial parity check, not a complete generated conformance suite.
 
 Run tests:
 
