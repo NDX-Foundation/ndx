@@ -1,0 +1,6 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Invalid language", "language": "e" },
+  "content": [{ "id": "p1", "type": "paragraph", "text": "Bad language tag." }]
+}
