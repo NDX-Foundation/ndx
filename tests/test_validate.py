@@ -1,4 +1,5 @@
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -71,6 +72,19 @@ class ValidateDocumentTests(unittest.TestCase):
             path.write_text(raw, encoding="utf-8")
             with self.assertRaises(ValueError):
                 validate_document(path)
+
+    def test_malformed_json_cli_uses_invalid_document_exit_code(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "malformed.json"
+            path.write_text('{"format":', encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "tools" / "validate.py"), str(path)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("INVALID:", result.stderr)
 
     def test_oversized_document_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
