@@ -1,0 +1,8 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Bad date", "language": "en", "created": "yesterday" },
+  "content": [
+    { "id": "p1", "type": "paragraph", "text": "Invalid date-time." }
+  ]
+}
