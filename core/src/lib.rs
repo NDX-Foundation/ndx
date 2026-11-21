@@ -211,4 +211,19 @@ mod tests {
         let input = br#"{"format":"ndx","modelVersion":"0.1","metadata":{"title":"x","language":"en"},"content":[]}"#;
         assert_eq!(parse_document(input).unwrap_err().code, "NDX_E_CONTENT");
     }
+    #[test] fn shared_all_blocks_fixture_parses() {
+        let input = include_bytes!("../../tests/fixtures/valid-all-blocks.ndx.json");
+        let document = parse_document(input).unwrap();
+        assert_eq!(document.content.len(), 4);
+    }
+    #[test] fn shared_invalid_field_fixtures_are_rejected() {
+        for input in [
+            include_bytes!("../../tests/fixtures/invalid-block-id.ndx.json").as_slice(),
+            include_bytes!("../../tests/fixtures/invalid-heading-level.ndx.json").as_slice(),
+            include_bytes!("../../tests/fixtures/invalid-figure-alt.ndx.json").as_slice(),
+            include_bytes!("../../tests/fixtures/invalid-language.ndx.json").as_slice(),
+        ] {
+            assert!(parse_document(input).is_err());
+        }
+    }
 }
