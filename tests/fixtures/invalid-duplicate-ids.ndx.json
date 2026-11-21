@@ -1,0 +1,9 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Duplicate IDs", "language": "en" },
+  "content": [
+    { "id": "same", "type": "paragraph", "text": "One." },
+    { "id": "same", "type": "paragraph", "text": "Two." }
+  ]
+}

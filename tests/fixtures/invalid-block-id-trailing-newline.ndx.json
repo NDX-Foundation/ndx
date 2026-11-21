@@ -1,0 +1,8 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Trailing newline ID", "language": "en" },
+  "content": [
+    { "id": "p1\n", "type": "paragraph", "text": "A trailing newline must not be accepted in an ID." }
+  ]
+}

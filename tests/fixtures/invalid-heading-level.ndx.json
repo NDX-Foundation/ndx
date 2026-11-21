@@ -1,0 +1,6 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Invalid heading", "language": "en" },
+  "content": [{ "id": "h1", "type": "heading", "level": 7, "text": "Too deep" }]
+}

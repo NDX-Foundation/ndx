@@ -1,0 +1,8 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": { "title": "Null optional", "language": "en", "creator": null },
+  "content": [
+    { "id": "p1", "type": "paragraph", "text": "Null is not an omitted field." }
+  ]
+}

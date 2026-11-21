@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -28,7 +30,10 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 
 
 def _load_json(path: Path) -> Any:
-    raw = path.read_bytes()
+    # Read at most limit + 1 bytes so oversized files are rejected without
+    # first allocating memory proportional to an untrusted file's full size.
+    with path.open("rb") as source:
+        raw = source.read(MAX_DOCUMENT_BYTES + 1)
     if len(raw) > MAX_DOCUMENT_BYTES:
         raise ValueError(f"document exceeds {MAX_DOCUMENT_BYTES} byte limit")
     text = raw.decode("utf-8")
@@ -48,6 +53,23 @@ def validate_document(document_path: Path) -> list[str]:
         f"{'.'.join(map(str, error.absolute_path)) or '<root>'}: {error.message}"
         for error in errors
     ]
+
+    # Keep date-time acceptance consistent across implementations even when
+    # a JSON Schema format checker is configured with reduced optional support.
+    if isinstance(document, dict):
+        metadata = document.get("metadata")
+        if isinstance(metadata, dict) and isinstance(metadata.get("created"), str):
+            created = metadata["created"]
+            rfc3339_shape = re.fullmatch(
+                r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})",
+                created,
+            )
+            try:
+                if not rfc3339_shape:
+                    raise ValueError("not RFC 3339")
+                datetime.fromisoformat(created.replace("Z", "+00:00"))
+            except ValueError:
+                messages.append("metadata.created: must be an RFC 3339 date-time")
 
     if isinstance(document, dict):
         blocks = document.get("content", [])
@@ -72,9 +94,14 @@ def main() -> int:
 
     try:
         errors = validate_document(args.document)
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError, DuplicateKeyError, ValueError) as exc:
+    except OSError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
+    except (UnicodeDecodeError, json.JSONDecodeError, DuplicateKeyError, ValueError) as exc:
+        # Invalid document input uses exit 1, matching the Rust CLI. Exit 2 is
+        # reserved for usage and filesystem errors in both implementations.
+        print(f"INVALID: {exc}", file=sys.stderr)
+        return 1
 
     if errors:
         for error in errors:

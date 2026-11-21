@@ -1,4 +1,5 @@
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -11,6 +12,28 @@ from validate import validate_document
 
 
 class ValidateDocumentTests(unittest.TestCase):
+    def test_shared_conformance_fixtures(self):
+        fixtures = ROOT / "tests" / "fixtures"
+        valid_fixtures = ("valid-minimal.ndx.json", "valid-all-blocks.ndx.json")
+        invalid_fixtures = (
+            "invalid-duplicate-ids.ndx.json",
+            "invalid-created-date.ndx.json",
+            "invalid-null-optional.ndx.json",
+            "invalid-block-id.ndx.json",
+            "invalid-heading-level.ndx.json",
+            "invalid-figure-alt.ndx.json",
+            "invalid-language.ndx.json",
+            "invalid-block-id-trailing-newline.ndx.json",
+        )
+
+        for fixture in valid_fixtures:
+            with self.subTest(fixture=fixture):
+                self.assertEqual(validate_document(fixtures / fixture), [])
+
+        for fixture in invalid_fixtures:
+            with self.subTest(fixture=fixture):
+                self.assertTrue(validate_document(fixtures / fixture))
+
     def test_example_document_is_valid(self):
         self.assertEqual(validate_document(ROOT / "examples" / "hello.ndx.json"), [])
 
@@ -49,6 +72,19 @@ class ValidateDocumentTests(unittest.TestCase):
             path.write_text(raw, encoding="utf-8")
             with self.assertRaises(ValueError):
                 validate_document(path)
+
+    def test_malformed_json_cli_uses_invalid_document_exit_code(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "malformed.json"
+            path.write_text('{"format":', encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "tools" / "validate.py"), str(path)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("INVALID:", result.stderr)
 
     def test_oversized_document_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

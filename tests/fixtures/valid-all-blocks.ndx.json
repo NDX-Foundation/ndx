@@ -1,0 +1,17 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": {
+    "title": "All supported blocks",
+    "language": "en",
+    "creator": "NDX fixture",
+    "created": "2026-11-21T12:00:00Z",
+    "description": "Exercises each currently supported block type."
+  },
+  "content": [
+    { "id": "h1", "type": "heading", "level": 1, "text": "Heading" },
+    { "id": "p1", "type": "paragraph", "text": "Paragraph" },
+    { "id": "l1", "type": "list", "ordered": true, "items": ["one", "two"] },
+    { "id": "f1", "type": "figure", "alt": "A sample figure", "caption": "Caption", "resource": "images/sample.png" }
+  ]
+}
