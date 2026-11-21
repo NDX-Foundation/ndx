@@ -1,0 +1,40 @@
+{
+  "format": "ndx",
+  "modelVersion": "0.1",
+  "metadata": {
+    "title": "Hello, NDX",
+    "language": "en",
+    "creator": "NDX Foundation",
+    "description": "A minimal example of the experimental NDX semantic document model."
+  },
+  "content": [
+    {
+      "id": "intro-title",
+      "type": "heading",
+      "level": 1,
+      "text": "Hello, NDX"
+    },
+    {
+      "id": "intro-paragraph",
+      "type": "paragraph",
+      "text": "This document stores basic semantic structure explicitly so software can identify the heading and paragraph without guessing from visual layout."
+    },
+    {
+      "id": "principles-title",
+      "type": "heading",
+      "level": 2,
+      "text": "Design principles"
+    },
+    {
+      "id": "principles-list",
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Semantic structure",
+        "Accessibility",
+        "Traceable evidence",
+        "Secure defaults"
+      ]
+    }
+  ]
+}
