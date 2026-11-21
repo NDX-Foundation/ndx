@@ -22,6 +22,7 @@ class ValidateDocumentTests(unittest.TestCase):
             "invalid-heading-level.ndx.json",
             "invalid-figure-alt.ndx.json",
             "invalid-language.ndx.json",
+            "invalid-block-id-trailing-newline.ndx.json",
         )
 
         for fixture in valid_fixtures:
